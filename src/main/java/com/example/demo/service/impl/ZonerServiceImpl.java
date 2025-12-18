@@ -68,7 +68,7 @@ public class ZoneServiceImpl implements ZoneService {
 
                 return zoneRepository.findByZoneName(name)
 
-                .orElseThrow(() -> new RException("Zone not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Zone not found"));
 
                 }
 
