@@ -40,7 +40,7 @@ public class ZoneServiceImpl implements ZoneService {
 
             if (zone.getPriorityLevel() == null || zone.getPriorityLevel() < 1) {
 
-                throw new IllegalArgumentException("Priority level must be >= 1");
+                throw new ResourceNotFoundException("Priority level must be >= 1");
 
                 }
 
@@ -50,7 +50,7 @@ public class ZoneServiceImpl implements ZoneService {
 
                 .ifPresent(z -> {
 
-                throw new IllegalArgumentException("Zone name already exists");
+                throw new ResourceNotFoundException("Zone name already exists");
 
                 });
 
@@ -68,7 +68,7 @@ public class ZoneServiceImpl implements ZoneService {
 
                 return zoneRepository.findByZoneName(name)
 
-                .orElseThrow(() -> new IllegalArgumentException("Zone not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Zone not found"));
 
                 }
 
