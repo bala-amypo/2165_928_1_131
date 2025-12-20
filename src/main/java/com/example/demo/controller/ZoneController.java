@@ -4,23 +4,35 @@ import com.example.demo.entity.Zone;
 import com.example.demo.service.ZoneService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/zones")
 public class ZoneController {
 
-    private final ZoneService service;
+    private final ZoneService zoneService;
 
-    public ZoneController(ZoneService service) {
-        this.service = service;
+    public ZoneController(ZoneService zoneService) {
+        this.zoneService = zoneService;
     }
 
     @PostMapping
-    public Zone create(@RequestBody Zone zone) {
-        return service.createZone(zone);
+    public Zone createZone(@RequestBody Zone zone) {
+        return zoneService.createZone(zone);
     }
 
     @GetMapping("/{id}")
-    public Zone get(@PathVariable Long id) {
-        return service.getZoneById(id);
+    public Zone getZone(@PathVariable Long id) {
+        return zoneService.getZoneById(id);
+    }
+
+    @GetMapping
+    public List<Zone> getAllZones() {
+        return zoneService.getAllZones();
+    }
+
+    @PutMapping("/{id}/deactivate")
+    public void deactivate(@PathVariable Long id) {
+        zoneService.deactivateZone(id);
     }
 }
