@@ -17,8 +17,8 @@ public class LoadSheddingController {
     }
 
     @PostMapping("/trigger/{forecastId}")
-    public void triggerLoadShedding(@PathVariable Long forecastId) {
-        loadSheddingService.triggerLoadShedding(forecastId);
+    public LoadSheddingEvent triggerLoadShedding(@PathVariable Long forecastId) {
+        return loadSheddingService.triggerLoadShedding(forecastId);
     }
 
     @GetMapping("/{id}")

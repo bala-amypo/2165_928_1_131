@@ -22,8 +22,9 @@ public class SupplyForecastController {
     }
 
     @PutMapping("/{id}")
-    public SupplyForecast updateForecast(@PathVariable Long id,
-                                         @RequestBody SupplyForecast forecast) {
+    public SupplyForecast updateForecast(
+            @PathVariable Long id,
+            @RequestBody SupplyForecast forecast) {
         return forecastService.updateForecast(id, forecast);
     }
 
