@@ -1,57 +1,33 @@
 package com.example.demo.entity;
 
-
-
 import jakarta.persistence.*;
-
 import lombok.*;
 
-
-
-import java.time.LocalDateTime;
-
-
+import java.time.Instant;
 
 @Entity
-
 @Getter
-
 @Setter
-
 @NoArgsConstructor
-
 @AllArgsConstructor
-
 @Builder
-
 public class ZoneRestorationRecord {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
+    // ✅ Relationship (REQUIRED)
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "zone_id")
+    private Zone zone;
 
-@Id
+    // 🔴 MUST be Instant
+    @Column(nullable = false)
+    private Instant restoredAt;
 
-@GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false)
+    private Long eventId;
 
-private Long id;
-
-
-
-@ManyToOne(optional = false)
-
-@JoinColumn(name = "zone_id")
-
-private Zone zone;
-
-
-
-private LocalDateTime restoredAt;
-
-
-
-private Long eventId;
-
-
-
-private String notes;
-
+    private String notes;
 }
