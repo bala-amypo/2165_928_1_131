@@ -1,10 +1,18 @@
 package com.example.demo.service;
 
-import com.example.demo.entity.AppUser;
+import com.example.demo.entity.Zone;
 
-public interface UserService {
+import java.util.List;
 
-    AppUser createUser(AppUser user);
+public interface ZoneService {
 
-    AppUser getUserByEmail(String email);
+    Zone createZone(Zone zone);
+
+    Zone updateZone(Long id, Zone zone);
+
+    Zone getZoneById(Long id);
+
+    List<Zone> getAllZones();
+
+    void deactivateZone(Long id);
 }
