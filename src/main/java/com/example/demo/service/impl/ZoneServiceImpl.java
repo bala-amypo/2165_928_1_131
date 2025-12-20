@@ -7,33 +7,47 @@ import com.example.demo.repository.ZoneRepository;
 import com.example.demo.service.ZoneService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ZoneServiceImpl implements ZoneService {
 
-    private final ZoneRepository repo;
+    private final ZoneRepository zoneRepository;
 
-    public ZoneServiceImpl(ZoneRepository repo) {
-        this.repo = repo;
+    public ZoneServiceImpl(ZoneRepository zoneRepository) {
+        this.zoneRepository = zoneRepository;
     }
 
     @Override
     public Zone createZone(Zone zone) {
 
-        if (zone.getPriorityLevel() < 1) {
+        if (zone.getPriorityLevel() == null || zone.getPriorityLevel() < 1) {
             throw new BadRequestException("priority must be >= 1");
         }
 
-        repo.findByZoneName(zone.getZoneName())
+        zoneRepository.findByZoneName(zone.getZoneName())
                 .ifPresent(z -> {
                     throw new BadRequestException("zone name must be unique");
                 });
 
-        return repo.save(zone);
+        return zoneRepository.save(zone);
     }
 
     @Override
     public Zone getZoneById(Long id) {
-        return repo.findById(id)
+        return zoneRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Zone not found"));
+    }
+
+    @Override
+    public List<Zone> getAllZones() {
+        return zoneRepository.findAll();
+    }
+
+    @Override
+    public void deactivateZone(Long id) {
+        Zone zone = getZoneById(id);
+        zone.setActive(false);
+        zoneRepository.save(zone);
     }
 }
