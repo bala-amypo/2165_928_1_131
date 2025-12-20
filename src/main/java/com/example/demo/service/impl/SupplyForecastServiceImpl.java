@@ -14,21 +14,17 @@ public class SupplyForecastServiceImpl implements SupplyForecastService {
 
     private final SupplyForecastRepository forecastRepo;
 
-    // ✅ Constructor injection (tests rely on this)
     public SupplyForecastServiceImpl(SupplyForecastRepository forecastRepo) {
         this.forecastRepo = forecastRepo;
     }
 
-    // ---------------- CREATE FORECAST ----------------
     @Override
     public SupplyForecast createForecast(SupplyForecast forecast) {
 
-        // 🔴 Supply must be >= 0
         if (forecast.getAvailableSupplyMW() < 0) {
             throw new BadRequestException("Supply must be >= 0");
         }
 
-        // 🔴 Forecast range validation
         if (!forecast.getForecastStart().isBefore(forecast.getForecastEnd())) {
             throw new BadRequestException("Invalid range");
         }
@@ -36,14 +32,11 @@ public class SupplyForecastServiceImpl implements SupplyForecastService {
         return forecastRepo.save(forecast);
     }
 
-    // ---------------- UPDATE FORECAST ----------------
     @Override
     public SupplyForecast updateForecast(Long id, SupplyForecast forecast) {
 
         SupplyForecast existing = forecastRepo.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Forecast not found")
-                );
+                .orElseThrow(() -> new ResourceNotFoundException("Forecast not found"));
 
         if (forecast.getAvailableSupplyMW() < 0) {
             throw new BadRequestException("Supply must be >= 0");
@@ -60,13 +53,20 @@ public class SupplyForecastServiceImpl implements SupplyForecastService {
         return forecastRepo.save(existing);
     }
 
-    // ---------------- GET FORECAST BY ID ----------------
     @Override
     public SupplyForecast getForecastById(Long id) {
         return forecastRepo.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Forecast not found")
-                );
+                .orElseThrow(() -> new ResourceNotFoundException("Forecast not found"));
     }
 
-    // ---------------- GET LATEST FORECAST ---
+    @Override
+    public SupplyForecast getLatestForecast() {
+        return forecastRepo.findFirstByOrderByGeneratedAtDesc()
+                .orElseThrow(() -> new ResourceNotFoundException("No forecasts"));
+    }
+
+    @Override
+    public List<SupplyForecast> getAllForecasts() {
+        return forecastRepo.findAll();
+    }
+}
