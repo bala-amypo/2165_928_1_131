@@ -17,8 +17,7 @@ public class ZoneRestorationController {
     }
 
     @PostMapping
-    public ZoneRestorationRecord restoreZone(
-            @RequestBody ZoneRestorationRecord record) {
+    public ZoneRestorationRecord restoreZone(@RequestBody ZoneRestorationRecord record) {
         return restorationService.restoreZone(record);
     }
 
@@ -28,8 +27,8 @@ public class ZoneRestorationController {
     }
 
     @GetMapping("/zone/{zoneId}")
-    public List<ZoneRestorationRecord> getRecordsForZone(
-            @PathVariable Long zoneId) {
+    public List<ZoneRestorationRecord> getRecordsForZone(@PathVariable Long zoneId) {
         return restorationService.getRecordsForZone(zoneId);
     }
 }
+`
