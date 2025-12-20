@@ -16,16 +16,6 @@ public class ZoneController {
         this.zoneService = zoneService;
     }
 
-    @PostMapping
-    public Zone createZone(@RequestBody Zone zone) {
-        return zoneService.createZone(zone);
-    }
-
-    @GetMapping("/{id}")
-    public Zone getZone(@PathVariable Long id) {
-        return zoneService.getZoneById(id);
-    }
-
     @GetMapping
     public List<Zone> getAllZones() {
         return zoneService.getAllZones();
