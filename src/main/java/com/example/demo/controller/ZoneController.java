@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.entity.Zone;
 import com.example.demo.service.ZoneService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,7 +18,7 @@ public class ZoneController {
     }
 
     @PostMapping
-    public Zone createZone(@RequestBody Zone zone) {
+    public Zone createZone(@Valid @RequestBody Zone zone) {
         return zoneService.createZone(zone);
     }
 
@@ -32,7 +33,7 @@ public class ZoneController {
     }
 
     @PutMapping("/{id}/deactivate")
-    public void deactivate(@PathVariable Long id) {
+    public void deactivateZone(@PathVariable Long id) {
         zoneService.deactivateZone(id);
     }
 }

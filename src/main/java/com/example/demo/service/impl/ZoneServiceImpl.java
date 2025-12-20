@@ -7,6 +7,7 @@ import com.example.demo.repository.ZoneRepository;
 import com.example.demo.service.ZoneService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -21,13 +22,9 @@ public class ZoneServiceImpl implements ZoneService {
     @Override
     public Zone createZone(Zone zone) {
 
-        if (zone.getPriorityLevel() == null || zone.getPriorityLevel() < 1) {
-            throw new BadRequestException("priority must be >= 1");
-        }
-
         zoneRepository.findByZoneName(zone.getZoneName())
                 .ifPresent(z -> {
-                    throw new BadRequestException("zone name must be unique");
+                    throw new BadRequestException("Zone name already exists");
                 });
 
         return zoneRepository.save(zone);
@@ -48,6 +45,7 @@ public class ZoneServiceImpl implements ZoneService {
     public void deactivateZone(Long id) {
         Zone zone = getZoneById(id);
         zone.setActive(false);
+        zone.setUpdatedAt(LocalDateTime.now());
         zoneRepository.save(zone);
     }
 }
