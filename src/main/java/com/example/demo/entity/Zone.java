@@ -1,17 +1,16 @@
 package com.example.demo.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(
-        name = "zones",
-        uniqueConstraints = @UniqueConstraint(columnNames = "zone_name")
-)
+@Table(name = "zones", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "zoneName")
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,26 +22,19 @@ public class Zone {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Zone name must not be empty")
-    @Column(name = "zone_name", nullable = false, unique = true)
+    @NotBlank(message = "Zone name cannot be empty")
+    @Column(nullable = false)
     private String zoneName;
 
-    @Min(value = 1, message = "Priority level must be >= 1")
+    @NotNull(message = "Priority level is required")
     @Column(nullable = false)
     private Integer priorityLevel;
 
     @Builder.Default
-    @Column(nullable = false)
     private Boolean active = true;
 
     @Builder.Default
-    @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
     private LocalDateTime updatedAt;
-
-    @PreUpdate
-    public void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
 }

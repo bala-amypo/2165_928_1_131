@@ -6,10 +6,9 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Entity
-@Table(
-        name = "app_users",
-        uniqueConstraints = @UniqueConstraint(columnNames = "email")
-)
+@Table(name = "app_users", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "email")
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,18 +20,18 @@ public class AppUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Email must not be empty")
-    @Email(message = "Invalid email format")
-    @Column(nullable = false, unique = true)
+    @Email
+    @NotBlank
+    @Column(nullable = false)
     private String email;
 
-    @NotBlank(message = "Password must not be empty")
+    @NotBlank
     @Column(nullable = false)
     private String password;
 
-    @NotBlank(message = "Role must not be empty")
+    @Builder.Default
     @Column(nullable = false)
-    private String role;
+    private String role = "USER";
 
     @Builder.Default
     @Column(nullable = false)
