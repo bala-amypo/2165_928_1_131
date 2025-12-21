@@ -1,11 +1,15 @@
-package com.example.demo.repository;
+package com.example.demo.service;
 
 import com.example.demo.entity.Zone;
-import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.List;
 
-import java.util.Optional;
+public interface ZoneService {
 
-public interface ZoneRepository extends JpaRepository<Zone, Long> {
+    Zone createZone(Zone zone);
 
-    Optional<Zone> findByZoneName(String zoneName);
+    Zone getZoneById(Long id);
+
+    List<Zone> getAllZones();
+
+    void deactivateZone(Long id);
 }
