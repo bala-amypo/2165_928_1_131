@@ -11,17 +11,14 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
 
-    // 🔴 Secret key (tests expect token to be decodable)
-    private final String SECRET_KEY = "smart-grid-secret-key";
-
-    // 1 hour validity
-    private final long VALIDITY = 60 * 60 * 1000;
+    private final String SECRET_KEY = "amypo-secret-key";
+    private final long VALIDITY = 1000 * 60 * 60; // 1 hour
 
     public String createToken(AppUser user) {
 
         Claims claims = Jwts.claims().setSubject(user.getEmail());
-        claims.put("role", user.getRole());
         claims.put("userId", user.getId());
+        claims.put("role", user.getRoles().iterator().next().getName());
 
         Date now = new Date();
         Date expiry = new Date(now.getTime() + VALIDITY);
