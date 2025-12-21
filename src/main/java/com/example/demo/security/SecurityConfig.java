@@ -20,40 +20,62 @@ public class SecurityConfig {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
+    // 🔐 PASSWORD ENCODER (FIXES PasswordEncoder BEAN ERROR)
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    // 🔐 AUTHENTICATION MANAGER
     @Bean
     public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration configuration
+            AuthenticationConfiguration authenticationConfiguration
     ) throws Exception {
-        return configuration.getAuthenticationManager();
+        return authenticationConfiguration.getAuthenticationManager();
     }
 
+    // 🔐 SECURITY FILTER CHAIN
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                .csrf(csrf -> csrf.disable())
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/auth/**",
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**"
-                        ).permitAll()
-                        .requestMatchers("/api/**").authenticated()
-                        .anyRequest().authenticated()
-                );
+            // ❌ Disable CSRF (important for Swagger & APIs)
+            .csrf(csrf -> csrf.disable())
 
-        http.addFilterBefore(
+            // ❌ No sessions (JWT based)
+            .sessionManagement(session ->
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
+
+            // ✅ AUTHORIZATION RULES
+            .authorizeHttpRequests(auth -> auth
+
+                // 🔓 Swagger
+                .requestMatchers(
+                    "/swagger-ui/**",
+                    "/v3/api-docs/**",
+                    "/swagger-ui.html"
+                ).permitAll()
+
+                // 🔓 Auth APIs
+                .requestMatchers(
+                    "/auth/**"
+                ).permitAll()
+
+                // 🔓 TEMP: Allow Zones (remove later if needed)
+                .requestMatchers(
+                    "/api/zones/**"
+                ).permitAll()
+
+                // 🔒 Everything else needs authentication
+                .anyRequest().authenticated()
+            )
+
+            // 🔐 JWT FILTER
+            .addFilterBefore(
                 jwtAuthenticationFilter,
                 UsernamePasswordAuthenticationFilter.class
-        );
+            );
 
         return http.build();
     }
