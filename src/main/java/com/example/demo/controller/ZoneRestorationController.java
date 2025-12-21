@@ -17,17 +17,17 @@ public class ZoneRestorationController {
     }
 
     @PostMapping
-    public ZoneRestorationRecord restoreZone(@RequestBody ZoneRestorationRecord record) {
+    public ZoneRestorationRecord restore(@RequestBody ZoneRestorationRecord record) {
         return restorationService.restoreZone(record);
     }
 
     @GetMapping("/{id}")
-    public ZoneRestorationRecord getRecordById(@PathVariable Long id) {
+    public ZoneRestorationRecord getById(@PathVariable Long id) {
         return restorationService.getRecordById(id);
     }
 
     @GetMapping("/zone/{zoneId}")
-    public List<ZoneRestorationRecord> getRecordsForZone(@PathVariable Long zoneId) {
+    public List<ZoneRestorationRecord> getForZone(@PathVariable Long zoneId) {
         return restorationService.getRecordsForZone(zoneId);
     }
 }
