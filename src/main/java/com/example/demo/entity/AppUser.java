@@ -1,14 +1,10 @@
 package com.example.demo.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Entity
-@Table(name = "app_users", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "email")
-})
+@Table(name = "app_users")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,20 +16,14 @@ public class AppUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Email
-    @NotBlank
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false)
     private String email;
 
-    @NotBlank
     @Column(nullable = false)
     private String password;
 
-    @Builder.Default
     @Column(nullable = false)
-    private String role = "USER";
+    private String role;
 
-    @Builder.Default
-    @Column(nullable = false)
-    private Boolean active = true;
+    private boolean active = true;
 }
