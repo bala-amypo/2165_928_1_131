@@ -26,10 +26,8 @@ public class SupplyForecast {
     @Column(nullable = false)
     private Instant forecastEnd;
 
-    @Column(nullable = false, updatable = false)
     private Instant generatedAt;
 
-    // 🔴 VERY IMPORTANT FOR TESTS
     @PrePersist
     public void onCreate() {
         this.generatedAt = Instant.now();

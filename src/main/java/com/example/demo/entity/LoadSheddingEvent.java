@@ -17,21 +17,17 @@ public class LoadSheddingEvent {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // ✅ Relationship (REQUIRED)
     @ManyToOne(optional = false)
     @JoinColumn(name = "zone_id")
     private Zone zone;
 
-    // 🔴 MUST be Instant
     @Column(nullable = false)
     private Instant eventStart;
 
-    // Optional (can be null initially)
     private Instant eventEnd;
 
     private String reason;
 
-    @Column(nullable = false)
     private Long triggeredByForecastId;
 
     @Column(nullable = false)

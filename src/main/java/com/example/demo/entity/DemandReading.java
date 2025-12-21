@@ -17,7 +17,6 @@ public class DemandReading {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // ✅ Relationship (CORRECT)
     @ManyToOne(optional = false)
     @JoinColumn(name = "zone_id")
     private Zone zone;
@@ -25,7 +24,6 @@ public class DemandReading {
     @Column(nullable = false)
     private Double demandMW;
 
-    // 🔴 MUST BE Instant (NOT LocalDateTime)
     @Column(nullable = false)
     private Instant recordedAt;
 }

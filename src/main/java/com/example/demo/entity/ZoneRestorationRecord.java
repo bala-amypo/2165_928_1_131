@@ -17,12 +17,10 @@ public class ZoneRestorationRecord {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // ✅ Relationship (REQUIRED)
     @ManyToOne(optional = false)
     @JoinColumn(name = "zone_id")
     private Zone zone;
 
-    // 🔴 MUST be Instant
     @Column(nullable = false)
     private Instant restoredAt;
 
