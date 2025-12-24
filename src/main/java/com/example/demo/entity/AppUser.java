@@ -1,13 +1,18 @@
-package com.example.demo.service;
+package com.example.demo.entity;
 
-import com.example.demo.entity.SupplyForecast;
-import java.util.List;
+import lombok.*;
+import java.util.Set;
 
-public interface SupplyForecastService {
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class AppUser {
 
-    SupplyForecast createForecast(SupplyForecast forecast);
-    SupplyForecast updateForecast(Long id, SupplyForecast forecast);
-    SupplyForecast getLatestForecast();
-    SupplyForecast getForecastById(Long id);   // 👈 ADD THIS
-    List<SupplyForecast> getAllForecasts();
+    private Long id;
+    private String email;
+    private String password;
+    private Boolean active;
+    private Set<String> roles;
 }
