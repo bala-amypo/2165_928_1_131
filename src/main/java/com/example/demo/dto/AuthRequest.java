@@ -1,11 +1,14 @@
 package com.example.demo.dto;
 
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class AuthRequest {
 
     private String email;
     private String password;
-    private String role;   // used during registration
+    private String role;
 }
