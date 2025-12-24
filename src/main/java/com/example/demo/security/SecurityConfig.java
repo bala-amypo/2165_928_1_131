@@ -20,13 +20,13 @@ public class SecurityConfig {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
-    // 🔐 PASSWORD ENCODER (FIXES PasswordEncoder BEAN ERROR)
+    // 🔐 Password encoder bean
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // 🔐 AUTHENTICATION MANAGER
+    // 🔐 Authentication manager bean
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration authenticationConfiguration
@@ -34,48 +34,35 @@ public class SecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    // 🔐 SECURITY FILTER CHAIN
+    // 🔐 Main security configuration
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-            // ❌ Disable CSRF (important for Swagger & APIs)
             .csrf(csrf -> csrf.disable())
 
-            // ❌ No sessions (JWT based)
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
 
-            // ✅ AUTHORIZATION RULES
             .authorizeHttpRequests(auth -> auth
 
-                // 🔓 Swagger
+                // 🔓 Public endpoints
                 .requestMatchers(
+                    "/auth/**",
                     "/swagger-ui/**",
                     "/v3/api-docs/**",
                     "/swagger-ui.html"
                 ).permitAll()
 
-                // 🔓 Auth APIs
-                .requestMatchers(
-                    "/auth/**"
-                ).permitAll()
+                // 🔒 Secure all API endpoints
+                .requestMatchers("/api/**").authenticated()
 
-                // 🔓 TEMP: Allow Zones (remove later if needed)
-                .requestMatchers(
-                    "/api/zones/**"
-                ).permitAll()
-
-                // 🔒 Everything else needs authentication
-                .anyRequest().authenticated()
+                // 🔓 Allow everything else (health checks etc.)
+                .anyRequest().permitAll()
             )
 
-            // 🔐 JWT FILTER
-            .addFilterBefore(
-                jwtAuthenticationFilter,
-                UsernamePasswordAuthenticationFilter.class
-            );
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
