@@ -6,6 +6,7 @@ import lombok.*;
 import java.time.Instant;
 
 @Entity
+@Table(name = "supply_forecasts")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -26,6 +27,7 @@ public class SupplyForecast {
     @Column(nullable = false)
     private Instant forecastEnd;
 
+    @Column(nullable = false, updatable = false)
     private Instant generatedAt;
 
     @PrePersist
