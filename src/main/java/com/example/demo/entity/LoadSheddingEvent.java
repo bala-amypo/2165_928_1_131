@@ -6,6 +6,7 @@ import lombok.*;
 import java.time.Instant;
 
 @Entity
+@Table(name = "load_shedding_events")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,7 +19,7 @@ public class LoadSheddingEvent {
     private Long id;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "zone_id")
+    @JoinColumn(name = "zone_id", nullable = false)
     private Zone zone;
 
     @Column(nullable = false)
@@ -26,8 +27,10 @@ public class LoadSheddingEvent {
 
     private Instant eventEnd;
 
+    @Column(nullable = false)
     private String reason;
 
+    @Column(nullable = false)
     private Long triggeredByForecastId;
 
     @Column(nullable = false)
