@@ -23,17 +23,16 @@ public class JwtTokenProvider {
 
     public boolean validateToken(String token) {
         try {
-            getClaims(token);
+            parseClaims(token);
             return true;
-        } catch (Exception e) {
+        } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
     }
 
-    public Claims getClaims(String token) {
-        return Jwts.parserBuilder()
+    public Claims parseClaims(String token) {
+        return Jwts.parser()
                 .setSigningKey(key)
-                .build()
                 .parseClaimsJws(token)
                 .getBody();
     }
