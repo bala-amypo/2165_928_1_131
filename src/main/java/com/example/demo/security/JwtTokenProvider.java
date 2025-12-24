@@ -13,27 +13,28 @@ public class JwtTokenProvider {
 
     public String createToken(AppUser user) {
         return Jwts.builder()
-                .setSubject(user.getEmail())
+                .subject(user.getEmail())
                 .claim("role", user.getRoles().iterator().next())
                 .claim("userId", user.getId())
-                .setIssuedAt(new Date())
+                .issuedAt(new Date())
                 .signWith(key)
                 .compact();
     }
 
     public boolean validateToken(String token) {
         try {
-            parseClaims(token);
+            parse(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
     }
 
-    public Claims parseClaims(String token) {
+    public Claims parse(String token) {
         return Jwts.parser()
-                .setSigningKey(key)
-                .parseClaimsJws(token)
-                .getBody();
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 }
