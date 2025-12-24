@@ -8,11 +8,13 @@ import com.example.demo.repository.DemandReadingRepository;
 import com.example.demo.repository.ZoneRepository;
 import com.example.demo.service.DemandReadingService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
 
 @Service
+@Transactional
 public class DemandReadingServiceImpl implements DemandReadingService {
 
     private final DemandReadingRepository readingRepository;
@@ -25,6 +27,7 @@ public class DemandReadingServiceImpl implements DemandReadingService {
     }
 
     @Override
+    @Transactional
     public DemandReading createReading(DemandReading reading) {
 
         Zone zone = zoneRepository.findById(reading.getZone().getId())
@@ -43,6 +46,7 @@ public class DemandReadingServiceImpl implements DemandReadingService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<DemandReading> getReadingsForZone(Long zoneId) {
 
         zoneRepository.findById(zoneId)
@@ -52,6 +56,7 @@ public class DemandReadingServiceImpl implements DemandReadingService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public DemandReading getLatestReading(Long zoneId) {
 
         return readingRepository.findFirstByZoneIdOrderByRecordedAtDesc(zoneId)
@@ -59,6 +64,7 @@ public class DemandReadingServiceImpl implements DemandReadingService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<DemandReading> getRecentReadings(Long zoneId, int limit) {
 
         List<DemandReading> readings =

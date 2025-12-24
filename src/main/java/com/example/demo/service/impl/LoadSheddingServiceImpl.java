@@ -12,11 +12,13 @@ import com.example.demo.repository.SupplyForecastRepository;
 import com.example.demo.repository.ZoneRepository;
 import com.example.demo.service.LoadSheddingService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
 
 @Service
+@Transactional
 public class LoadSheddingServiceImpl implements LoadSheddingService {
 
     private final SupplyForecastRepository forecastRepository;
@@ -37,6 +39,7 @@ public class LoadSheddingServiceImpl implements LoadSheddingService {
     }
 
     @Override
+    @Transactional
     public LoadSheddingEvent triggerLoadShedding(Long forecastId) {
 
         SupplyForecast forecast = forecastRepository.findById(forecastId)
@@ -63,7 +66,6 @@ public class LoadSheddingServiceImpl implements LoadSheddingService {
             throw new BadRequestException("No overload");
         }
 
-        // Shed from lowest priority zone (highest priorityLevel number)
         Zone targetZone = activeZones.get(activeZones.size() - 1);
 
         DemandReading latestReading = readingRepository
@@ -84,17 +86,20 @@ public class LoadSheddingServiceImpl implements LoadSheddingService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public LoadSheddingEvent getEventById(Long id) {
         return eventRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Event not found"));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<LoadSheddingEvent> getEventsForZone(Long zoneId) {
         return eventRepository.findByZoneIdOrderByEventStartDesc(zoneId);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<LoadSheddingEvent> getAllEvents() {
         return eventRepository.findAll();
     }
