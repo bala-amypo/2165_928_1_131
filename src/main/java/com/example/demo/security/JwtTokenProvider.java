@@ -14,7 +14,7 @@ public class JwtTokenProvider {
     public String createToken(AppUser user) {
         return Jwts.builder()
                 .setSubject(user.getEmail())
-                .claim("role", user.getRole())
+                .claim("role", user.getRoles().iterator().next())
                 .claim("userId", user.getId())
                 .setIssuedAt(new Date())
                 .signWith(key)
@@ -25,7 +25,7 @@ public class JwtTokenProvider {
         try {
             getClaims(token);
             return true;
-        } catch (JwtException | IllegalArgumentException e) {
+        } catch (Exception e) {
             return false;
         }
     }

@@ -19,14 +19,22 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
-    public AppUser createUser(String email, String password) {
+    public AppUser register(String email, String password, String role) {
         AppUser user = AppUser.builder()
                 .email(email)
                 .password(encoder.encode(password))
                 .active(true)
-                .roles(Set.of("ROLE_USER"))
+                .roles(Set.of(role))
                 .build();
         return repo.save(user);
+    }
+
+    @Override
+    public AppUser login(String email, String password) {
+        AppUser user = repo.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        return user;
     }
 
     @Override
