@@ -1,16 +1,11 @@
 package com.example.demo.service;
 
 import com.example.demo.entity.LoadSheddingEvent;
-
-import java.util.List;
+import java.util.*;
 
 public interface LoadSheddingService {
-
     LoadSheddingEvent triggerLoadShedding(Long forecastId);
-
     LoadSheddingEvent getEventById(Long id);
-
-    List<LoadSheddingEvent> getEventsForZone(Long zoneId);
-
     List<LoadSheddingEvent> getAllEvents();
+    List<LoadSheddingEvent> getEventsForZone(Long zoneId);
 }

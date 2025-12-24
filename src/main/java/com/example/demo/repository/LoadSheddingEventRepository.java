@@ -1,11 +1,11 @@
 package com.example.demo.repository;
 
 import com.example.demo.entity.LoadSheddingEvent;
-import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.*;
 
-import java.util.List;
-
-public interface LoadSheddingEventRepository extends JpaRepository<LoadSheddingEvent, Long> {
-
+public interface LoadSheddingEventRepository {
+    Optional<LoadSheddingEvent> findById(Long id);
+    List<LoadSheddingEvent> findAll();
     List<LoadSheddingEvent> findByZoneIdOrderByEventStartDesc(Long zoneId);
+    LoadSheddingEvent save(LoadSheddingEvent event);
 }
