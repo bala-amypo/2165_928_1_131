@@ -1,9 +1,4 @@
-import org.springframework.transaction.annotation.Transactional;
-
-@Service
-@Transactional
-public class ZoneServiceImpl implements ZoneService {
-        @Override
+    @Override
     @Transactional
     public Zone createZone(Zone zone) { ... }
 
@@ -22,4 +17,3 @@ public class ZoneServiceImpl implements ZoneService {
     @Override
     @Transactional
     public void deactivateZone(Long id) { ... }
-
