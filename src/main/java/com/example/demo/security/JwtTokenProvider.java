@@ -37,4 +37,9 @@ public class JwtTokenProvider {
                 .parseSignedClaims(token)
                 .getPayload();
     }
+
+    // 👇 for tests
+    public Claims getClaims(String token) {
+        return parse(token);
+    }
 }
