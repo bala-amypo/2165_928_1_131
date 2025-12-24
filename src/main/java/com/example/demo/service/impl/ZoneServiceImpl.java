@@ -1,69 +1,25 @@
-package com.example.demo.service.impl;
-
-import com.example.demo.entity.Zone;
-import com.example.demo.exception.BadRequestException;
-import com.example.demo.exception.ResourceNotFoundException;
-import com.example.demo.repository.ZoneRepository;
-import com.example.demo.service.ZoneService;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class ZoneServiceImpl implements ZoneService {
-
-    private final ZoneRepository zoneRepository;
-
-    public ZoneServiceImpl(ZoneRepository zoneRepository) {
-        this.zoneRepository = zoneRepository;
-    }
+        @Override
+    @Transactional
+    public Zone createZone(Zone zone) { ... }
 
     @Override
-    public Zone createZone(Zone zone) {
-
-        if (zone.getPriorityLevel() == null || zone.getPriorityLevel() < 1) {
-            throw new BadRequestException("priorityLevel must be >= 1");
-        }
-
-        zoneRepository.findByZoneName(zone.getZoneName())
-                .ifPresent(z -> {
-                    throw new BadRequestException("zoneName must be unique");
-                });
-
-        zone.setActive(true);
-        return zoneRepository.save(zone);
-    }
+    @Transactional
+    public Zone updateZone(Long id, Zone zone) { ... }
 
     @Override
-    public Zone updateZone(Long id, Zone zone) {
-
-        Zone existing = zoneRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Zone not found"));
-
-        existing.setZoneName(zone.getZoneName());
-        existing.setPriorityLevel(zone.getPriorityLevel());
-        existing.setPopulation(zone.getPopulation());
-
-        return zoneRepository.save(existing);
-    }
+    @Transactional(readOnly = true)
+    public Zone getZoneById(Long id) { ... }
 
     @Override
-    public Zone getZoneById(Long id) {
-        return zoneRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Zone not found"));
-    }
+    @Transactional(readOnly = true)
+    public List<Zone> getAllZones() { ... }
 
     @Override
-    public List<Zone> getAllZones() {
-        return zoneRepository.findAll();
-    }
+    @Transactional
+    public void deactivateZone(Long id) { ... }
 
-    @Override
-    public void deactivateZone(Long id) {
-        Zone zone = zoneRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Zone not found"));
-
-        zone.setActive(false);
-        zoneRepository.save(zone);
-    }
-}
