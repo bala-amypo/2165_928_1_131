@@ -6,6 +6,7 @@ import lombok.*;
 import java.util.Set;
 
 @Entity
+@Table(name = "app_users")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -26,11 +27,12 @@ public class AppUser {
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
+            joinColumns = @JoinColumn(name = "user_id", nullable = false),
+            inverseJoinColumns = @JoinColumn(name = "role_id", nullable = false)
     )
     private Set<Role> roles;
 
     @Builder.Default
+    @Column(nullable = false)
     private Boolean active = true;
 }
