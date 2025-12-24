@@ -6,6 +6,7 @@ import lombok.*;
 import java.time.Instant;
 
 @Entity
+@Table(name = "demand_readings")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,8 +18,8 @@ public class DemandReading {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "zone_id")
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "zone_id", nullable = false)
     private Zone zone;
 
     @Column(nullable = false)
