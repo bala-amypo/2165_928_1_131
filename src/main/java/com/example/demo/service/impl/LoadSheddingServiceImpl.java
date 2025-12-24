@@ -1,106 +1,61 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.entity.DemandReading;
-import com.example.demo.entity.LoadSheddingEvent;
-import com.example.demo.entity.SupplyForecast;
-import com.example.demo.entity.Zone;
-import com.example.demo.exception.BadRequestException;
-import com.example.demo.exception.ResourceNotFoundException;
-import com.example.demo.repository.DemandReadingRepository;
-import com.example.demo.repository.LoadSheddingEventRepository;
-import com.example.demo.repository.SupplyForecastRepository;
-import com.example.demo.repository.ZoneRepository;
+import com.example.demo.entity.*;
+import com.example.demo.exception.*;
+import com.example.demo.repository.*;
 import com.example.demo.service.LoadSheddingService;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.List;
+import java.util.*;
 
-@Service
-@Transactional
 public class LoadSheddingServiceImpl implements LoadSheddingService {
 
-    private final SupplyForecastRepository forecastRepository;
-    private final ZoneRepository zoneRepository;
-    private final DemandReadingRepository readingRepository;
-    private final LoadSheddingEventRepository eventRepository;
+    private final SupplyForecastRepository forecastRepo;
+    private final ZoneRepository zoneRepo;
+    private final DemandReadingRepository readingRepo;
+    private final LoadSheddingEventRepository eventRepo;
 
-    public LoadSheddingServiceImpl(
-            SupplyForecastRepository forecastRepository,
-            ZoneRepository zoneRepository,
-            DemandReadingRepository readingRepository,
-            LoadSheddingEventRepository eventRepository
-    ) {
-        this.forecastRepository = forecastRepository;
-        this.zoneRepository = zoneRepository;
-        this.readingRepository = readingRepository;
-        this.eventRepository = eventRepository;
+    public LoadSheddingServiceImpl(SupplyForecastRepository f, ZoneRepository z,
+                                  DemandReadingRepository r, LoadSheddingEventRepository e) {
+        this.forecastRepo = f;
+        this.zoneRepo = z;
+        this.readingRepo = r;
+        this.eventRepo = e;
     }
 
-    @Override
-    @Transactional
     public LoadSheddingEvent triggerLoadShedding(Long forecastId) {
-
-        SupplyForecast forecast = forecastRepository.findById(forecastId)
+        SupplyForecast f = forecastRepo.findById(forecastId)
                 .orElseThrow(() -> new ResourceNotFoundException("Forecast not found"));
 
-        List<Zone> activeZones = zoneRepository.findByActiveTrueOrderByPriorityLevelAsc();
-        if (activeZones.isEmpty()) {
-            throw new BadRequestException("No suitable zones");
-        }
+        List<Zone> zones = zoneRepo.findByActiveTrueOrderByPriorityLevelAsc();
+        if (zones.isEmpty()) throw new BadRequestException("No overload");
 
-        double totalDemand = 0;
-
-        for (Zone zone : activeZones) {
-            DemandReading latest = readingRepository
-                    .findFirstByZoneIdOrderByRecordedAtDesc(zone.getId())
-                    .orElse(null);
-
-            if (latest != null) {
-                totalDemand += latest.getDemandMW();
+        for (Zone z : zones) {
+            Optional<DemandReading> dr = readingRepo.findFirstByZoneIdOrderByRecordedAtDesc(z.getId());
+            if (dr.isPresent() && dr.get().getDemandMW() > f.getAvailableSupplyMW()) {
+                LoadSheddingEvent ev = LoadSheddingEvent.builder()
+                        .zoneId(z.getId())
+                        .expectedDemandReductionMW(dr.get().getDemandMW())
+                        .eventStart(Instant.now())
+                        .reason("Auto shedding")
+                        .build();
+                return eventRepo.save(ev);
             }
         }
 
-        if (totalDemand <= forecast.getAvailableSupplyMW()) {
-            throw new BadRequestException("No overload");
-        }
-
-        Zone targetZone = activeZones.get(activeZones.size() - 1);
-
-        DemandReading latestReading = readingRepository
-                .findFirstByZoneIdOrderByRecordedAtDesc(targetZone.getId())
-                .orElseThrow(() -> new BadRequestException("No suitable zones"));
-
-        double reduction = totalDemand - forecast.getAvailableSupplyMW();
-
-        LoadSheddingEvent event = LoadSheddingEvent.builder()
-                .zone(targetZone)
-                .eventStart(Instant.now())
-                .reason("Automatic load shedding due to overload")
-                .triggeredByForecastId(forecastId)
-                .expectedDemandReductionMW(Math.max(reduction, 0))
-                .build();
-
-        return eventRepository.save(event);
+        throw new BadRequestException("No overload");
     }
 
-    @Override
-    @Transactional(readOnly = true)
     public LoadSheddingEvent getEventById(Long id) {
-        return eventRepository.findById(id)
+        return eventRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Event not found"));
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<LoadSheddingEvent> getEventsForZone(Long zoneId) {
-        return eventRepository.findByZoneIdOrderByEventStartDesc(zoneId);
+    public List<LoadSheddingEvent> getAllEvents() {
+        return eventRepo.findAll();
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<LoadSheddingEvent> getAllEvents() {
-        return eventRepository.findAll();
+    public List<LoadSheddingEvent> getEventsForZone(Long zoneId) {
+        return eventRepo.findByZoneIdOrderByEventStartDesc(zoneId);
     }
 }
