@@ -11,10 +11,12 @@ import com.example.demo.security.JwtTokenProvider;
 import com.example.demo.service.AppUserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 
 @Service
+@Transactional
 public class AppUserServiceImpl implements AppUserService {
 
     private final AppUserRepository userRepository;
@@ -35,6 +37,7 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
+    @Transactional
     public AppUser register(String email, String password, String roleName) {
 
         userRepository.findByEmail(email)
@@ -58,6 +61,7 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public AuthResponse login(String email, String password) {
 
         AppUser user = userRepository.findByEmail(email)

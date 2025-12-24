@@ -1,79 +1,71 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.entity.DemandReading;
-import com.example.demo.entity.Zone;
+import com.example.demo.entity.SupplyForecast;
 import com.example.demo.exception.BadRequestException;
 import com.example.demo.exception.ResourceNotFoundException;
-import com.example.demo.repository.DemandReadingRepository;
-import com.example.demo.repository.ZoneRepository;
-import com.example.demo.service.DemandReadingService;
+import com.example.demo.repository.SupplyForecastRepository;
+import com.example.demo.service.SupplyForecastService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.util.List;
 
 @Service
 @Transactional
-public class DemandReadingServiceImpl implements DemandReadingService {
+public class SupplyForecastServiceImpl implements SupplyForecastService {
 
-    private final DemandReadingRepository readingRepository;
-    private final ZoneRepository zoneRepository;
+    private final SupplyForecastRepository forecastRepository;
 
-    public DemandReadingServiceImpl(DemandReadingRepository readingRepository,
-                                    ZoneRepository zoneRepository) {
-        this.readingRepository = readingRepository;
-        this.zoneRepository = zoneRepository;
+    public SupplyForecastServiceImpl(SupplyForecastRepository forecastRepository) {
+        this.forecastRepository = forecastRepository;
     }
 
     @Override
     @Transactional
-    public DemandReading createReading(DemandReading reading) {
+    public SupplyForecast createForecast(SupplyForecast forecast) {
 
-        Zone zone = zoneRepository.findById(reading.getZone().getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Zone not found"));
-
-        if (reading.getDemandMW() < 0) {
-            throw new BadRequestException("demandMW must be >= 0");
+        if (forecast.getAvailableSupplyMW() < 0) {
+            throw new BadRequestException("availableSupplyMW must be >= 0");
         }
 
-        if (reading.getRecordedAt().isAfter(Instant.now())) {
-            throw new BadRequestException("recordedAt cannot be in the future");
+        if (forecast.getForecastStart().isAfter(forecast.getForecastEnd())) {
+            throw new BadRequestException("Invalid forecast range");
         }
 
-        reading.setZone(zone);
-        return readingRepository.save(reading);
+        return forecastRepository.save(forecast);
+    }
+
+    @Override
+    @Transactional
+    public SupplyForecast updateForecast(Long id, SupplyForecast forecast) {
+
+        SupplyForecast existing = forecastRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Forecast not found"));
+
+        existing.setAvailableSupplyMW(forecast.getAvailableSupplyMW());
+        existing.setForecastStart(forecast.getForecastStart());
+        existing.setForecastEnd(forecast.getForecastEnd());
+
+        return forecastRepository.save(existing);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<DemandReading> getReadingsForZone(Long zoneId) {
-
-        zoneRepository.findById(zoneId)
-                .orElseThrow(() -> new ResourceNotFoundException("Zone not found"));
-
-        return readingRepository.findByZoneIdOrderByRecordedAtDesc(zoneId);
+    public SupplyForecast getForecastById(Long id) {
+        return forecastRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Forecast not found"));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public DemandReading getLatestReading(Long zoneId) {
-
-        return readingRepository.findFirstByZoneIdOrderByRecordedAtDesc(zoneId)
-                .orElseThrow(() -> new ResourceNotFoundException("No readings"));
+    public SupplyForecast getLatestForecast() {
+        return forecastRepository.findFirstByOrderByGeneratedAtDesc()
+                .orElseThrow(() -> new ResourceNotFoundException("No forecasts"));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<DemandReading> getRecentReadings(Long zoneId, int limit) {
-
-        List<DemandReading> readings =
-                readingRepository.findByZoneIdOrderByRecordedAtDesc(zoneId);
-
-        if (readings.size() <= limit) {
-            return readings;
-        }
-
-        return readings.subList(0, limit);
+    public List<SupplyForecast> getAllForecasts() {
+        return forecastRepository.findAll();
     }
 }

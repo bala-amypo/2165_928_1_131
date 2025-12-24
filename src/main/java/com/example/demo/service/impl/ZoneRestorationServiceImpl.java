@@ -10,8 +10,12 @@ import com.example.demo.repository.ZoneRepository;
 import com.example.demo.repository.ZoneRestorationRecordRepository;
 import com.example.demo.service.ZoneRestorationService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
+@Transactional
 public class ZoneRestorationServiceImpl implements ZoneRestorationService {
 
     private final ZoneRestorationRecordRepository restorationRepository;
@@ -29,6 +33,7 @@ public class ZoneRestorationServiceImpl implements ZoneRestorationService {
     }
 
     @Override
+    @Transactional
     public ZoneRestorationRecord restoreZone(ZoneRestorationRecord record) {
 
         LoadSheddingEvent event = eventRepository.findById(record.getEventId())
@@ -46,13 +51,15 @@ public class ZoneRestorationServiceImpl implements ZoneRestorationService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ZoneRestorationRecord getRecordById(Long id) {
         return restorationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Record not found"));
     }
 
     @Override
-    public java.util.List<ZoneRestorationRecord> getRecordsForZone(Long zoneId) {
+    @Transactional(readOnly = true)
+    public List<ZoneRestorationRecord> getRecordsForZone(Long zoneId) {
         return restorationRepository.findByZoneIdOrderByRestoredAtDesc(zoneId);
     }
 }
