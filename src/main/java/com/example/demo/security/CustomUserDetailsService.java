@@ -22,6 +22,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             throws UsernameNotFoundException {
 
         AppUser user = userRepository.findByEmail(email)
+                .filter(AppUser::getActive)
                 .orElseThrow(() ->
                         new UsernameNotFoundException("User not found")
                 );
@@ -30,7 +31,13 @@ public class CustomUserDetailsService implements UserDetailsService {
                 user.getEmail(),
                 user.getPassword(),
                 user.getRoles().stream()
-                        .map(r -> new SimpleGrantedAuthority("ROLE_" + r.getName()))
+                        .map(role -> {
+                            String name = role.getName();
+                            if (!name.startsWith("ROLE_")) {
+                                name = "ROLE_" + name;
+                            }
+                            return new SimpleGrantedAuthority(name);
+                        })
                         .collect(Collectors.toSet())
         );
     }
