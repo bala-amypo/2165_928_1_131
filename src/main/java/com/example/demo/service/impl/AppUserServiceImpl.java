@@ -4,10 +4,12 @@ import com.example.demo.entity.AppUser;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.repository.AppUserRepository;
 import com.example.demo.service.AppUserService;
+import org.springframework.stereotype.Service; // <--- Import this
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Set;
 
+@Service // <--- THIS WAS MISSING
 public class AppUserServiceImpl implements AppUserService {
 
     private final AppUserRepository repo;
@@ -31,6 +33,8 @@ public class AppUserServiceImpl implements AppUserService {
 
     @Override
     public AppUser login(String email, String password) {
+        // Note: Password checking is usually done by AuthenticationManager
+        // but fetching the user here is fine.
         AppUser user = repo.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
