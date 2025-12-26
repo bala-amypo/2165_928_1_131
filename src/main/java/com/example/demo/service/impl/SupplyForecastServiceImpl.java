@@ -5,7 +5,6 @@ import com.example.demo.exception.BadRequestException;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.repository.SupplyForecastRepository;
 import com.example.demo.service.SupplyForecastService;
-
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -22,6 +21,7 @@ public class SupplyForecastServiceImpl implements SupplyForecastService {
 
     @Override
     public SupplyForecast createForecast(SupplyForecast f) {
+
         if (f.getAvailableSupplyMW() < 0)
             throw new BadRequestException(">= 0");
 
@@ -34,6 +34,7 @@ public class SupplyForecastServiceImpl implements SupplyForecastService {
 
     @Override
     public SupplyForecast updateForecast(Long id, SupplyForecast f) {
+
         SupplyForecast ex = repo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Forecast not found"));
 

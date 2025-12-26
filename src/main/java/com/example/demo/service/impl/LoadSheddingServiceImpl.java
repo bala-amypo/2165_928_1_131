@@ -40,13 +40,14 @@ public class LoadSheddingServiceImpl implements LoadSheddingService {
         }
 
         for (Zone z : zones) {
+
             Optional<DemandReading> dr =
                     readingRepo.findFirstByZoneIdOrderByRecordedAtDesc(z.getId());
 
             if (dr.isPresent() && dr.get().getDemandMW() > forecast.getAvailableSupplyMW()) {
 
                 LoadSheddingEvent event = LoadSheddingEvent.builder()
-                        .zone(z)   // ✅ FIXED
+                        .zoneId(z.getId())  // matches your entity
                         .expectedDemandReductionMW(dr.get().getDemandMW())
                         .eventStart(Instant.now())
                         .reason("Auto shedding")

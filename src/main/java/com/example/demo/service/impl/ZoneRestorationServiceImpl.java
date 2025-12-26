@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service   // ✅ REQUIRED
+@Service
 public class ZoneRestorationServiceImpl implements ZoneRestorationService {
 
     private final ZoneRestorationRecordRepository recordRepo;
@@ -25,14 +25,16 @@ public class ZoneRestorationServiceImpl implements ZoneRestorationService {
 
     @Override
     public ZoneRestorationRecord restoreZone(ZoneRestorationRecord r) {
+
         LoadSheddingEvent ev = eventRepo.findById(r.getEventId())
                 .orElseThrow(() -> new ResourceNotFoundException("Event not found"));
 
         Zone z = zoneRepo.findById(r.getZone().getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Zone not found"));
 
-        if (!r.getRestoredAt().isAfter(ev.getEventStart()))
+        if (!r.getRestoredAt().isAfter(ev.getEventStart())) {
             throw new BadRequestException("after event start");
+        }
 
         r.setZone(z);
         return recordRepo.save(r);
