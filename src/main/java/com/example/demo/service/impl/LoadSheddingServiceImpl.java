@@ -4,7 +4,6 @@ import com.example.demo.entity.*;
 import com.example.demo.exception.*;
 import com.example.demo.repository.*;
 import com.example.demo.service.LoadSheddingService;
-
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -20,9 +19,9 @@ public class LoadSheddingServiceImpl implements LoadSheddingService {
     private final LoadSheddingEventRepository eventRepo;
 
     public LoadSheddingServiceImpl(SupplyForecastRepository forecastRepo,
-                                  ZoneRepository zoneRepo,
-                                  DemandReadingRepository readingRepo,
-                                  LoadSheddingEventRepository eventRepo) {
+                                   ZoneRepository zoneRepo,
+                                   DemandReadingRepository readingRepo,
+                                   LoadSheddingEventRepository eventRepo) {
         this.forecastRepo = forecastRepo;
         this.zoneRepo = zoneRepo;
         this.readingRepo = readingRepo;
@@ -47,7 +46,7 @@ public class LoadSheddingServiceImpl implements LoadSheddingService {
             if (dr.isPresent() && dr.get().getDemandMW() > forecast.getAvailableSupplyMW()) {
 
                 LoadSheddingEvent event = LoadSheddingEvent.builder()
-                        .zoneId(z.getId())                     // ✅ fixed
+                        .zone(z)   // ✅ FIXED
                         .expectedDemandReductionMW(dr.get().getDemandMW())
                         .eventStart(Instant.now())
                         .reason("Auto shedding")
