@@ -31,6 +31,7 @@ public class LoadSheddingServiceImpl implements LoadSheddingService {
 
     @Override
     public LoadSheddingEvent triggerLoadShedding(Long forecastId) {
+
         SupplyForecast forecast = forecastRepo.findById(forecastId)
                 .orElseThrow(() -> new ResourceNotFoundException("Forecast not found"));
 
@@ -46,7 +47,7 @@ public class LoadSheddingServiceImpl implements LoadSheddingService {
             if (dr.isPresent() && dr.get().getDemandMW() > forecast.getAvailableSupplyMW()) {
 
                 LoadSheddingEvent event = LoadSheddingEvent.builder()
-                        .zoneId(z.getId())                                // ✅ fixed
+                        .zoneId(z.getId())                     // ✅ fixed
                         .expectedDemandReductionMW(dr.get().getDemandMW())
                         .eventStart(Instant.now())
                         .reason("Auto shedding")
