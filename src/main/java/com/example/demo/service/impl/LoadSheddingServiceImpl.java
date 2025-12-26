@@ -5,9 +5,12 @@ import com.example.demo.exception.*;
 import com.example.demo.repository.*;
 import com.example.demo.service.LoadSheddingService;
 
+import org.springframework.stereotype.Service;   // ✅ add this
+
 import java.time.Instant;
 import java.util.*;
 
+@Service   // ✅ add this
 public class LoadSheddingServiceImpl implements LoadSheddingService {
 
     private final SupplyForecastRepository forecastRepo;
@@ -23,6 +26,7 @@ public class LoadSheddingServiceImpl implements LoadSheddingService {
         this.eventRepo = e;
     }
 
+    @Override
     public LoadSheddingEvent triggerLoadShedding(Long forecastId) {
         SupplyForecast f = forecastRepo.findById(forecastId)
                 .orElseThrow(() -> new ResourceNotFoundException("Forecast not found"));
@@ -34,7 +38,7 @@ public class LoadSheddingServiceImpl implements LoadSheddingService {
             Optional<DemandReading> dr = readingRepo.findFirstByZoneIdOrderByRecordedAtDesc(z.getId());
             if (dr.isPresent() && dr.get().getDemandMW() > f.getAvailableSupplyMW()) {
                 LoadSheddingEvent ev = LoadSheddingEvent.builder()
-                        .zoneId(z.getId())
+                        .zone(z)
                         .expectedDemandReductionMW(dr.get().getDemandMW())
                         .eventStart(Instant.now())
                         .reason("Auto shedding")
@@ -46,15 +50,18 @@ public class LoadSheddingServiceImpl implements LoadSheddingService {
         throw new BadRequestException("No overload");
     }
 
+    @Override
     public LoadSheddingEvent getEventById(Long id) {
         return eventRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Event not found"));
     }
 
+    @Override
     public List<LoadSheddingEvent> getAllEvents() {
         return eventRepo.findAll();
     }
 
+    @Override
     public List<LoadSheddingEvent> getEventsForZone(Long zoneId) {
         return eventRepo.findByZoneIdOrderByEventStartDesc(zoneId);
     }
