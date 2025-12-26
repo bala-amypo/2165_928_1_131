@@ -18,9 +18,8 @@ public class LoadSheddingEvent {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "zone_id")
-    private Zone zone;
+    @Column(name = "zone_id", nullable = false)
+    private Long zoneId;
 
     private Double expectedDemandReductionMW;
 
